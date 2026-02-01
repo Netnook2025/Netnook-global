@@ -19,9 +19,11 @@ interface ErrorBoundaryState {
 // Fix: Import Component directly and use constructor to ensure props typing is correctly inferred
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   public state: ErrorBoundaryState;
+  public readonly props: Readonly<ErrorBoundaryProps>;
 
   constructor(props: ErrorBoundaryProps) {
     super(props);
+    this.props = props;
     this.state = { hasError: false, error: null };
   }
 
