@@ -1750,5 +1750,59 @@ export default function App() {
         </>
       )}
     </div>
+  );import React, { useEffect, useState } from 'react';
+import { auth, googleProvider } from './firebase'; // استورد من firebase.ts
+import { signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
+
+function App() {
+  const [user, setUser] = useState<User | null>(null); // لحفظ بيانات المستخدم
+
+  // مراقبة حالة التسجيل
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return unsubscribe;
+  }, []);
+
+  // دالة تسجيل الدخول بـ Google
+  const handleSignIn = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Error signing in:", error);
+    }
+  };
+
+  // دالة تسجيل الخروج
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  return (
+    <div>
+      {/* محتواك الحالي، زي المنشورات أو الفئات (Education/News/Entertainment) */}
+      <header style={{ padding: '10px', background: '#f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>NetNook - Global Cache</h1>
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img src={user.photoURL || ''} alt="Profile" style={{ width: '30px', borderRadius: '50%', marginRight: '10px' }} />
+            <span>{user.displayName}</span>
+            <button onClick={handleSignOut} style={{ marginLeft: '10px', background: '#f44336', color: 'white', padding: '5px 10px', border: 'none', cursor: 'pointer' }}>تسجيل الخروج</button>
+            <a href="/profile" style={{ marginLeft: '10px', color: '#4285F4' }}>الملف الشخصي</a> {/* أضف صفحة profile.tsx لو عايز */}
+          </div>
+        ) : (
+          <button onClick={handleSignIn} style={{ background: '#4285F4', color: 'white', padding: '10px', border: 'none', cursor: 'pointer' }}>تسجيل الدخول</button>
+        )}
+      </header>
+      {/* باقي الصفحة، مثل <div>مرحباً بك في NetNook</div> أو مكونات أخرى */}
+    </div>
   );
+}
+
+export default App;
 }
